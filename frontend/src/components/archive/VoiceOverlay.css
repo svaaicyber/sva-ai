@@ -1,0 +1,100 @@
+.vo-overlay{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  animation:vo-in 0.3s ease both;
+}
+@keyframes vo-in{from{opacity:0}to{opacity:1}}
+.vo-bg{position:absolute;inset:0;background:rgba(8,9,16,0.93);backdrop-filter:blur(24px)}
+.vo-content{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;gap:32px;
+  animation:vo-up 0.4s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes vo-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.vo-orb-wrap{position:relative;width:110px;height:110px;display:flex;align-items:center;justify-content:center}
+.vo-orb-core{
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle at 38% 38%,rgba(99,102,241,0.3),rgba(34,211,238,0.1));
+  border:1px solid rgba(99,102,241,0.35);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--indigo);position:relative;z-index:2;
+  box-shadow:0 0 40px rgba(99,102,241,0.2);
+}
+.vo-ring{position:absolute;border-radius:50%;border:1px solid rgba(99,102,241,0.1);animation:vo-ring 2s ease-in-out infinite}
+.vr1{width:96px;height:96px;animation-delay:0s}
+.vr2{width:120px;height:120px;animation-delay:0.35s}
+.vr3{width:144px;height:144px;animation-delay:0.7s;border-color:rgba(99,102,241,0.05)}
+@keyframes vo-ring{0%,100%{transform:scale(1);opacity:0.8}50%{transform:scale(1.04);opacity:0.2}}
+.vo-label{font-family:var(--fm);font-size:11px;letter-spacing:0.22em;color:var(--indigo);opacity:0.7;text-transform:uppercase}
+.vo-bars{display:flex;align-items:center;gap:3px;height:28px}
+.vo-bar{width:3px;border-radius:2px;background:var(--indigo);opacity:0.5;animation:vo-bar 0.9s ease-in-out infinite alternate}
+@keyframes vo-bar{from{height:3px;opacity:0.2}to{height:26px;opacity:0.8}}
+.vo-cancel{
+  padding:9px 26px;border-radius:var(--r-full);
+  border:1px solid var(--b2);background:transparent;
+  color:var(--t1);font-family:var(--ff);font-size:13px;cursor:pointer;transition:all 0.2s;
+}
+.vo-cancel:hover{border-color:var(--b3);color:var(--t0)}
+.voice-overlay{
+
+backdrop-filter:blur(25px);
+
+animation:
+voiceFade .4s ease;
+
+}
+
+.voice-circle{
+
+animation:
+voicePulse 2s infinite ease;
+
+}
+
+@keyframes voicePulse{
+
+0%,100%{
+
+transform:scale(1);
+
+box-shadow:
+
+0 0 20px rgba(
+99,
+102,
+241,
+0.2
+);
+
+}
+
+50%{
+
+transform:scale(1.08);
+
+box-shadow:
+
+0 0 60px rgba(
+99,
+102,
+241,
+0.5
+);
+
+}
+
+}
+
+@keyframes voiceFade{
+
+from{
+
+opacity:0;
+
+}
+
+to{
+
+opacity:1;
+
+}

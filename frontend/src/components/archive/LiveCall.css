@@ -1,0 +1,231 @@
+.live-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: live-in 0.35s ease both;
+}
+
+@keyframes live-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.live-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(6,7,10,0.96);
+  backdrop-filter: blur(30px);
+}
+
+.live-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  animation: live-up 0.4s ease both;
+}
+
+@keyframes live-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Grid decoration */
+.live-grid {
+  position: absolute;
+  inset: -120px;
+  background-image:
+    linear-gradient(rgba(200,255,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,255,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, black 20%, transparent 70%);
+}
+
+/* Top label */
+.live-top-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--lime);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.7;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 8px var(--lime);
+  animation: ldot 1.5s ease-in-out infinite;
+}
+
+@keyframes ldot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* Avatar */
+.live-avatar-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(200,255,0,0.2), rgba(200,255,0,0.03));
+  border: 1px solid rgba(200,255,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.live-avatar span {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.1em;
+  color: var(--lime);
+}
+
+.live-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200,255,0,0.1);
+  animation: lring 2.5s ease-in-out infinite;
+}
+
+.lr1 { width: 108px; height: 108px; animation-delay: 0s; }
+.lr2 { width: 128px; height: 128px; animation-delay: 0.5s; }
+
+@keyframes lring {
+  0%, 100% { transform: scale(1);    opacity: 0.7; }
+  50%       { transform: scale(1.05); opacity: 0.2; }
+}
+
+/* Info */
+.live-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-name {
+  font-family: var(--font-display);
+  font-size: 32px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.live-duration {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-mid);
+  letter-spacing: 0.1em;
+}
+
+/* Waveform */
+.live-waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+}
+
+.live-wbar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--lime);
+  opacity: 0.4;
+  animation: lwbar 1s ease-in-out infinite alternate;
+}
+
+@keyframes lwbar {
+  from { height: 4px;  opacity: 0.2; }
+  to   { height: 28px; opacity: 0.7; }
+}
+
+/* End button */
+.live-end {
+  padding: 12px 40px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,71,87,0.3);
+  background: rgba(255,71,87,0.08);
+  color: var(--red);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  margin-top: 8px;
+}
+
+.live-end:hover {
+  background: rgba(255,71,87,0.15);
+  border-color: rgba(255,71,87,0.5);
+  box-shadow: 0 4px 20px rgba(255,71,87,0.15);
+}
+.live-call{
+
+animation:
+liveAppear .4s ease;
+
+}
+
+.live-avatar{
+
+animation:
+floatCall 4s infinite ease;
+
+}
+
+@keyframes floatCall{
+
+0%,100%{
+
+transform:translateY(0px);
+
+}
+
+50%{
+
+transform:translateY(-10px);
+
+}
+
+}
+
+@keyframes liveAppear{
+
+from{
+
+opacity:0;
+
+transform:scale(.95);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}

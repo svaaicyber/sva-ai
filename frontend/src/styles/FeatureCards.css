@@ -1,0 +1,106 @@
+.feature-cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  
+  /* Just enough width so 7 cards don't squish, but stay centered */
+  max-width: 1050px; 
+  margin: 10px auto 60px auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.feature-card {
+  flex: 1;
+  min-width: 130px;
+  max-width: 160px;
+  height: 160px;
+  padding: 22px 18px;
+  border-radius: 24px;
+  
+  background: rgba(15, 15, 20, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.feature-card * {
+  pointer-events: none;
+  z-index: 2;
+  position: relative;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  background: rgba(20, 20, 28, 0.7);
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 25px -5px rgba(168, 85, 247, 0.15);
+}
+
+.feature-card:hover::before {
+  opacity: 0;
+}
+
+.feature-icon {
+  color: #e4e4e7;
+  margin-bottom: auto;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  color: #a855f7;
+  transform: scale(1.05);
+}
+
+/* 🔥 FONT FIX: Exactly matching Sidebar Fonts 🔥 */
+.feature-card h3 {
+  font-family: 'Montserrat', sans-serif; /* Shifted to Montserrat for that bold layout */
+  font-size: 15px;
+  font-weight: 700; /* Crisp and bold */
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  color: #f8fafc;
+  margin: 0 0 6px 0;
+}
+
+.feature-card p {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* =========================================
+   HIDE FEATURE CARDS ON MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .feature-cards {
+
+    display: none;
+  }
+
+}

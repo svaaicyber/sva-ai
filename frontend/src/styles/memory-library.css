@@ -1,0 +1,281 @@
+/* =========================================
+   COMMON DASHBOARD STYLES
+========================================= */
+.sva-dashboard-wrapper {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 20px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title-section h1 {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+}
+
+.title-section p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.05);
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #d4d4d8;
+}
+
+/* =========================================
+   NEURAL MEMORY UI
+========================================= */
+.add-memory-box {
+  display: flex;
+  gap: 10px;
+  background: #121212;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 6px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+.add-memory-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.add-memory-box button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #a855f7;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-memory-box button:hover {
+  background: #9333ea;
+}
+
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.memory-card {
+  display: flex;
+  align-items: center;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 16px 20px;
+  border-radius: 14px;
+  gap: 16px;
+  transition: 0.2s;
+}
+
+.memory-card:hover {
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateX(4px);
+}
+
+.memory-card p {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  color: #e2e8f0;
+}
+
+.del-btn {
+  background: transparent;
+  border: none;
+  color: #52525b;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.del-btn:hover {
+  color: #ef4444;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #71717a;
+}
+
+/* DANGER ZONE */
+.danger-zone {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.danger-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.danger-text h3 {
+  margin: 0 0 4px 0;
+  color: #ef4444;
+  font-size: 16px;
+}
+
+.danger-text p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 13px;
+  max-width: 400px;
+}
+
+.wipe-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wipe-btn:hover:not(:disabled) {
+  background: #ef4444;
+  color: #fff;
+}
+
+.wipe-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   ASSET LIBRARY UI
+========================================= */
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.library-card {
+  background: #121212;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.library-card:hover .img-wrapper img {
+  transform: scale(1.05);
+}
+
+.img-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.library-card:hover .img-overlay {
+  opacity: 1;
+}
+
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.icon-btn.download { background: #fff; color: #000; }
+.icon-btn.delete { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.5); }
+.icon-btn:hover { transform: scale(1.1); }
+
+.img-info {
+  padding: 16px;
+}
+
+.prompt {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date {
+  font-size: 11px;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .sva-dashboard-wrapper { padding: 20px; }
+  .danger-zone { flex-direction: column; gap: 20px; text-align: center; }
+  .danger-text { flex-direction: column; align-items: center; }
+}

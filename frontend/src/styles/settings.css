@@ -1,0 +1,281 @@
+/* ==========================================
+   SVA PREMIUM SETTINGS UI
+========================================== */
+
+/* 1. FULL SCREEN OVERLAY */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+/* 2. MAIN MODAL CONTAINER */
+.settings-modal {
+  background: var(--bg-card, #09090b);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 950px;
+  height: 85vh;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: var(--text-main, #fff);
+  font-family: 'Inter', sans-serif;
+  animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 3. LEFT SIDEBAR NAVIGATION */
+.settings-sidebar {
+  width: 260px;
+  background: var(--bg-primary, #050508);
+  border-right: 1px solid var(--border-color, #27272a);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable-sidebar::-webkit-scrollbar { width: 4px; }
+.scrollable-sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+.settings-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.set-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted, #a1a1aa);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.set-nav-item:hover {
+  background: var(--bg-secondary, #121212);
+  color: var(--text-main, #fff);
+}
+
+.set-nav-item.active {
+  background: var(--bg-secondary, #121212);
+  color: var(--text-main, #fff);
+  position: relative;
+}
+
+/* Active Indicator */
+.set-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background: var(--accent, #06b6d4);
+  border-radius: 0 4px 4px 0;
+}
+
+/* 4. RIGHT CONTENT AREA */
+.settings-content {
+  flex: 1;
+  padding: 32px 48px;
+  overflow-y: auto;
+  background: var(--bg-card, #09090b);
+  position: relative;
+}
+
+.settings-content::-webkit-scrollbar { width: 6px; }
+.settings-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+.settings-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 28px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.settings-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-main);
+}
+
+/* 5. CARDS & ROWS */
+.setting-card {
+  background: var(--bg-primary, #050508);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: 12px;
+  padding: 0 24px;
+  margin-bottom: 24px;
+}
+
+.setting-card > .setting-row:first-child { padding-top: 20px !important; }
+.setting-card > .setting-row:last-child { padding-bottom: 20px !important; }
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-divider {
+  height: 1px;
+  background: var(--border-color, #27272a);
+  width: 100%;
+  margin: 0;
+}
+
+/* 6. BUTTONS */
+.set-btn-secondary {
+  background: var(--bg-secondary, #121212);
+  border: 1px solid var(--border-color, #27272a);
+  color: var(--text-main, #fff);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.set-btn-secondary:hover {
+  border-color: var(--accent, #06b6d4);
+}
+
+.set-btn-danger {
+  background: rgba(248, 113, 113, 0.05);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  color: #f87171;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.set-btn-danger:hover {
+  background: #f87171;
+  color: #000;
+}
+
+/* 7. TOGGLE SWITCHES */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border-color, rgba(255,255,255,0.1));
+  transition: .3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-muted, #94a3b8);
+  transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+input:checked + .slider { background-color: var(--accent, #06b6d4); }
+input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
+
+.slider.round { border-radius: 24px; }
+.slider.round:before { border-radius: 50%; }
+
+/* 8. KEYBOARD SHORTCUTS */
+.shortcut-kbd {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  box-shadow: 0 2px 0 var(--border-color);
+  letter-spacing: 0.5px;
+}
+
+/* 9. SELECT & INPUTS */
+.set-input-flat {
+  font-family: 'Inter', sans-serif;
+}
+.set-input-flat:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+}
+
+/* 10. RESPONSIVE MOBILE VIEW */
+@media (max-width: 768px) {
+  .settings-modal {
+    flex-direction: column;
+    height: 95vh;
+    border-radius: 12px;
+  }
+  
+  .settings-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px;
+  }
+  
+  .settings-content {
+    padding: 24px 20px;
+  }
+  
+  .setting-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .setting-row > select, 
+  .setting-row > button {
+    width: 100%;
+  }
+
+  .switch {
+    align-self: flex-start;
+  }
+}

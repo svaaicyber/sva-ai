@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#000; color:#06b6d4; font-family:monospace; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh;">
+    <h2>BIT SHIFT ENGINE</h2>
+    <div id="target" style="font-size:40px; margin:20px;">Target: 0</div>
+    <div id="current" style="font-size:30px; margin:20px;">Current: 1</div>
+    <div style="display:flex; gap:20px;">
+        <button onclick="shift(1)" style="padding:15px; background:#1e1e24; color:#fff; border:1px solid #06b6d4;">SHIFT << 1</button>
+        <button onclick="shift(0)" style="padding:15px; background:#1e1e24; color:#fff; border:1px solid #06b6d4;">BITWISE XOR 1</button>
+    </div>
+    <script>
+        let target = Math.floor(Math.random() * 20);
+        let curr = 1;
+        function shift(type) {
+            type ? curr <<= 1 : curr ^= 1;
+            document.getElementById('current').innerText = "Current: " + curr;
+            if(curr === target) {
+                window.parent.postMessage({ type: 'GAME_OVER', coins: 100 }, '*');
+            }
+        }
+        document.getElementById('target').innerText = "Target: " + target;
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+.app {
+  display: flex;
+  height: 100vh;
+  /* 🚨 Hardcoded black background hata diya. Ab ye body ka color lega */
+  background-color: transparent; 
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* 🚨 Linear gradient hata diya kyunki light mode pe ajeeb lagega */
+  background-color: transparent; 
+}

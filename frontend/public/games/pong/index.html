@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; color: #fff; font-family: 'Inter', sans-serif;}
+        canvas { background: #121212; border-top: 2px solid #a855f7; border-bottom: 2px solid #a855f7; box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
+        h2 { color: #a855f7; text-transform: uppercase; letter-spacing: 3px; }
+    </style>
+</head>
+<body>
+    <h2>Neon Pong</h2>
+    <canvas id="game" width="600" height="400"></canvas>
+    <p style="color:#71717a">Use W / S keys to move</p>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const paddleHeight = 80, paddleWidth = 10;
+        let pY = 160, botY = 160, bX = 300, bY = 200, bDX = 5, bDY = 4, score = 0;
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "w" && pY > 0) pY -= 30;
+            if (e.key === "s" && pY < canvas.height - paddleHeight) pY += 30;
+        });
+
+        function loop() {
+            requestAnimationFrame(loop);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            // Move Ball
+            bX += bDX; bY += bDY;
+
+            // Bot AI
+            if (botY + paddleHeight/2 < bY) botY += 4; else botY -= 4;
+
+            // Wall Bounce
+            if (bY <= 0 || bY >= canvas.height) bDY *= -1;
+
+            // Paddle Bounce
+            if (bX <= paddleWidth && bY > pY && bY < pY + paddleHeight) { bDX *= -1; score+=10; bDX+=0.5; }
+            if (bX >= canvas.width - paddleWidth && bY > botY && bY < botY + paddleHeight) bDX *= -1;
+
+            // Game Over (Ball out of bounds left)
+            if (bX < 0) {
+                bX = 300; bY = 200; bDX = 5;
+                setTimeout(() => window.parent.postMessage({ type: 'GAME_OVER', coins: score }, '*'), 500);
+                score = 0;
+            }
+
+            // Draw
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, pY, paddleWidth, paddleHeight); // Player
+            ctx.fillRect(canvas.width - paddleWidth, botY, paddleWidth, paddleHeight); // Bot
+            ctx.fillStyle = '#a855f7';
+            ctx.fillRect(bX, bY, 10, 10); // Ball
+            
+            ctx.font = "20px monospace"; ctx.fillStyle = "#555";
+            ctx.fillText("Score: " + score, 20, 30);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

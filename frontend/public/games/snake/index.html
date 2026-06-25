@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        canvas { background: #121212; border: 2px solid #06b6d4; border-radius: 8px; box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+        h2 { color: #06b6d4; text-transform: uppercase; letter-spacing: 2px; }
+        .score { font-size: 20px; color: #a1a1aa; margin-bottom: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h2>Cyber Snake</h2>
+    <div class="score">Score: <span id="score">0</span></div>
+    <canvas id="game" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        let grid = 20, count = 0, score = 0;
+        let snake = { x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4 };
+        let apple = { x: 320, y: 320 };
+
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+        function loop() {
+            requestAnimationFrame(loop);
+            if (++count < 6) return;
+            count = 0;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            snake.x += snake.dx; snake.y += snake.dy;
+            if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) gameOver();
+
+            snake.cells.unshift({x: snake.x, y: snake.y});
+            if (snake.cells.length > snake.maxCells) snake.cells.pop();
+
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(apple.x, apple.y, grid-1, grid-1);
+
+            ctx.fillStyle = '#06b6d4';
+            snake.cells.forEach(function(cell, index) {
+                ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+                if (cell.x === apple.x && cell.y === apple.y) {
+                    snake.maxCells++; score += 10;
+                    document.getElementById('score').innerText = score;
+                    apple.x = getRandomInt(0, 20) * grid; apple.y = getRandomInt(0, 20) * grid;
+                }
+                for (let i = index + 1; i < snake.cells.length; i++) {
+                    if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) gameOver();
+                }
+            });
+        }
+
+        function gameOver() {
+            setTimeout(() => window.parent.postMessage({ type: 'GAME_OVER', coins: score }, '*'), 500);
+            snake.x = 160; snake.y = 160; snake.cells = []; snake.maxCells = 4; snake.dx = grid; snake.dy = 0;
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.which === 37 && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
+            else if (e.which === 38 && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
+            else if (e.which === 39 && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
+            else if (e.which === 40 && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
+        });
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

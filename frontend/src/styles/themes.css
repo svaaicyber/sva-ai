@@ -1,0 +1,42 @@
+/* ==========================================
+   SVA THEME TOKENS
+========================================== */
+/* Default & Dark Theme */
+:root, body.theme-dark {
+  --bg-primary: #050508;
+  --bg-secondary: #121212;
+  --bg-card: #09090b;
+  --text-main: #ececec;
+  --text-muted: #a1a1aa;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --accent: #06b6d4;
+}
+
+/* Light Theme */
+body.theme-light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --accent: #0ea5e9;
+}
+
+/* SVA Natural (Web Only - Warm Paper Aesthetic) */
+body.theme-sva-natural {
+  --bg-primary: #f4ece4; 
+  --bg-secondary: #eaddcf;
+  --bg-card: #fdfbf7;
+  --text-main: #2c2825;
+  --text-muted: #78716c;
+  --border-color: rgba(44, 40, 37, 0.1);
+  --accent: #059669; 
+}
+
+/* Smooth Transition for the whole app */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}

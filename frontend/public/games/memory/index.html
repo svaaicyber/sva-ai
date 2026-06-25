@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVA Memory Match</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; user-select: none; }
+        h2 { margin: 0 0 20px 0; font-size: 24px; color: #10b981; letter-spacing: 1px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 70px); gap: 10px; }
+        .card { width: 70px; height: 70px; background-color: #27272a; border-radius: 8px; border: 2px solid #3f3f46; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.3s; transform-style: preserve-3d; }
+        .card.flipped { background-color: #121212; border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); pointer-events: none; }
+        .card span { opacity: 0; transition: 0.2s; }
+        .card.flipped span { opacity: 1; }
+        .stats { margin-top: 20px; color: #a1a1aa; font-family: 'Fira Code', monospace; }
+    </style>
+</head>
+<body>
+
+    <h2>Cognitive Match</h2>
+    <div class="grid" id="grid"></div>
+    <div class="stats">Moves: <span id="moves">0</span></div>
+
+    <script>
+        const symbols = ['⚛️', '🧬', '🧠', '🛰️', '🪐', '💻', '🔮', '⚡'];
+        let cards = [...symbols, ...symbols];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+
+        // Shuffle
+        cards.sort(() => 0.5 - Math.random());
+
+        const grid = document.getElementById("grid");
+        
+        cards.forEach((symbol, index) => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.symbol = symbol;
+            card.innerHTML = `<span>${symbol}</span>`;
+            card.onclick = () => flipCard(card);
+            grid.appendChild(card);
+        });
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains("flipped")) {
+                card.classList.add("flipped");
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    moves++;
+                    document.getElementById("moves").innerText = moves;
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                matchedPairs++;
+                flippedCards = [];
+                if (matchedPairs === symbols.length) {
+                    // Win Logic! Less moves = more coins
+                    let coins = moves <= 12 ? 100 : (moves <= 16 ? 50 : 20);
+                    setTimeout(() => window.parent.postMessage({ type: 'GAME_OVER', coins: coins }, '*'), 1000);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove("flipped");
+                    card2.classList.remove("flipped");
+                    flippedCards = [];
+                }, 800);
+            }
+        }
+    </script>
+</body>
+</html>

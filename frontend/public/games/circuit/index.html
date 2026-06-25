@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#000; color:#fff; font-family:monospace; text-align:center;">
+    <h2>CIRCUIT LOGIC: Make Output HIGH</h2>
+    <div id="gate" style="font-size:50px; margin:30px;">AND GATE</div>
+    <div style="display:flex; justify-content:center; gap:20px;">
+        <button onclick="check(0)">0</button>
+        <button onclick="check(1)">1</button>
+    </div>
+    <script>
+        let i1 = 0, i2 = 1;
+        function check(v) {
+            if((i1 & i2) === v) {
+                window.parent.postMessage({ type: 'GAME_OVER', coins: 150 }, '*');
+            } else { alert("SHORT CIRCUIT!"); }
+        }
+    </script>
+</body>
+</html>

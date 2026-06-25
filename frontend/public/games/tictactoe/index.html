@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVA Pro Tic Tac Toe</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; user-select: none; }
+        h2 { color: #06b6d4; letter-spacing: 2px; text-transform: uppercase; }
+        .board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 5px; background-color: #27272a; border: 2px solid #06b6d4; border-radius: 10px; padding: 5px; box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+        .cell { background-color: #121212; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .cell:hover { background-color: #1e1e24; }
+        .cell.x { color: #06b6d4; text-shadow: 0 0 10px #06b6d4; }
+        .cell.o { color: #f43f5e; text-shadow: 0 0 10px #f43f5e; } /* Changed O to Red/Pink for danger */
+        .status { margin-top: 20px; font-size: 18px; color: #a1a1aa; }
+    </style>
+</head>
+<body>
+
+    <h2>Pro Tic-Tac-Toe</h2>
+    <div class="board" id="board">
+        <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
+    </div>
+    <div class="status" id="status">Your Turn (X)</div>
+
+    <script>
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let gameActive = true;
+
+        const winConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
+        ];
+
+        function checkWin() {
+            for (let i = 0; i < winConditions.length; i++) {
+                const [a, b, c] = winConditions[i];
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    document.getElementById("status").innerText = `${currentPlayer === 'X' ? 'You Win!' : 'SVA Bot Wins!'}`;
+                    gameActive = false;
+                    triggerReactEvent(currentPlayer === "X" ? 50 : 5); // 50 for win, 5 for losing to pro bot
+                    return;
+                }
+            }
+            if (!board.includes("")) {
+                document.getElementById("status").innerText = "Draw!";
+                gameActive = false;
+                triggerReactEvent(20);
+            }
+        }
+
+        function triggerReactEvent(coins) {
+            setTimeout(() => window.parent.postMessage({ type: 'GAME_OVER', coins: coins }, '*'), 1000);
+        }
+
+        function makeMove(index) {
+            if (board[index] !== "" || !gameActive) return;
+
+            board[index] = currentPlayer;
+            updateUI(index, currentPlayer);
+            checkWin();
+
+            if (gameActive) {
+                currentPlayer = "O";
+                document.getElementById("status").innerText = "SVA Bot is computing...";
+                setTimeout(botProMove, 600);
+            }
+        }
+
+        function updateUI(index, player) {
+            const cells = document.getElementsByClassName("cell");
+            cells[index].innerText = player;
+            cells[index].classList.add(player.toLowerCase());
+        }
+
+        // 🧠 THE PRO BOT LOGIC
+        function botProMove() {
+            if (!gameActive) return;
+
+            // Helper to find a winning or blocking move
+            function findBestIndex(targetPlayer) {
+                for (let i = 0; i < winConditions.length; i++) {
+                    const [a, b, c] = winConditions[i];
+                    if (board[a] === targetPlayer && board[b] === targetPlayer && board[c] === "") return c;
+                    if (board[a] === targetPlayer && board[c] === targetPlayer && board[b] === "") return b;
+                    if (board[b] === targetPlayer && board[c] === targetPlayer && board[a] === "") return a;
+                }
+                return -1;
+            }
+
+            let moveIndex = -1;
+
+            // 1. Can Bot Win?
+            moveIndex = findBestIndex("O");
+            
+            // 2. Can Bot Block Player from winning?
+            if (moveIndex === -1) moveIndex = findBestIndex("X");
+            
+            // 3. Take the Center if empty
+            if (moveIndex === -1 && board[4] === "") moveIndex = 4;
+            
+            // 4. Otherwise, pick a random available spot
+            if (moveIndex === -1) {
+                let emptyCells = [];
+                board.forEach((c, i) => { if (c === "") emptyCells.push(i); });
+                moveIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            }
+
+            board[moveIndex] = "O";
+            updateUI(moveIndex, "O");
+            checkWin();
+
+            if (gameActive) {
+                currentPlayer = "X";
+                document.getElementById("status").innerText = "Your Turn (X)";
+            }
+        }
+    </script>
+</body>
+</html>
