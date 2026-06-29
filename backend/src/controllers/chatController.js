@@ -1,10 +1,9 @@
 import Groq from "groq-sdk";
 import dotenv from "dotenv";
 import Chat from "../models/Chat.js";
+import Library from "../models/Library.js"; // 🚨 LIBRARY ADD KIYA HAI YAHAN
 import { searchNearbyPlaces } from "../services/searchEngine.js";
 import { webSearch } from "../services/searchService.js";
-
-// Node.js v25+ has built-in fetch, so no node-fetch import needed!
 
 dotenv.config();
 
@@ -12,7 +11,6 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-// 🛠️ FIX: Environment variable se Ollama URL lo, warna default fallback use karo
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 
 export const chat = async (req, res) => {
@@ -27,21 +25,15 @@ export const chat = async (req, res) => {
       model = "SVA Flash",
       ghostMode,
       systemDirectives,
-      image // Frontend se Base64 Image string
+      image 
     } = req.body;
 
     const userId = req.user.id;
     const lowerPrompt = message ? message.toLowerCase() : "";
 
-    /* =========================================
-       🛡️ SMART MEMORY: FOLLOW-UP DETECTION
-    ========================================= */
     const followUpRegex = /^(what should i do|help me|suggest|then\??|why\??|how\??|kya karu|batao|explain|ok|okay|yes|no)$/i;
     const isFollowUp = followUpRegex.test(lowerPrompt.trim());
 
-    /* =========================================
-       🍕 FOOD INTENT DETECTION
-    ========================================= */
     const foodRegex = /\b(hungry|food|eat|burger|pizza|shawarma|restaurant|cafe|near me|biryani)\b/i;
     const isFoodQuery = foodRegex.test(lowerPrompt) && !isFollowUp;
 
@@ -51,9 +43,6 @@ export const chat = async (req, res) => {
     else if (lowerPrompt.includes("burger")) searchKeyword = "burger";
     else if (lowerPrompt.includes("biryani")) searchKeyword = "biryani";
 
-    /* =========================================
-       🧠 NATIVE MEMORY BUILDER (10 Messages)
-    ========================================= */
     const previousChats = await Chat.find({ sessionId, userId }).sort({ createdAt: -1 }).limit(10);
     
     let directivesBlock = systemDirectives?.trim() ? `\n[GLOBAL SYSTEM DIRECTIVES]\n${systemDirectives}\n` : "";
@@ -85,9 +74,6 @@ CRITICAL RULES:
       messagesArray.push({ role: "assistant", content: chat.reply });
     });
 
-    /* =========================================
-       🔍 SEARCH ENGINE FILTER
-    ========================================= */
     let webContext = "";
     if (!isFollowUp && !image) { 
       if (isFoodQuery && location) {
@@ -110,9 +96,6 @@ CRITICAL RULES:
       messagesArray.push({ role: "system", content: `CURRENT WEB DATA FOR CONTEXT (Use if relevant):\n${webContext}` });
     }
 
-    /* =========================================
-       📷 VISION OR TEXT USER CONTENT SETUP
-    ========================================= */
     if (image) {
       console.log("📸 Image detected! Formatting request for Vision Model...");
       messagesArray.push({
@@ -126,14 +109,10 @@ CRITICAL RULES:
       messagesArray.push({ role: "user", content: message });
     }
 
-    /* =========================================
-       🚨 UNIVERSAL MULTI-ENGINE ROUTER
-    ========================================= */
     let reply = "SVA could not generate a response.";
     const activeModel = image ? "SVA Vision" : model;
 
     try {
-      // 📷 CASE 0: VISION ANALYSIS
       if (activeModel === "SVA Vision") {
         console.log("⚙️ Executing Vision Track on Groq Llama 4 Scout...");
         const chatCompletion = await groq.chat.completions.create({
@@ -144,7 +123,6 @@ CRITICAL RULES:
         reply = chatCompletion.choices?.[0]?.message?.content || reply;
       }
       
-      // ⚡ CASE 1: GROQ (SVA Flash) -> Fallback to Ollama
       else if (activeModel === "SVA Flash") {
         console.log("⚙️ Executing SVA Flash on Groq Llama 3.1 8B...");
         try {
@@ -156,7 +134,6 @@ CRITICAL RULES:
           reply = chatCompletion.choices?.[0]?.message?.content || reply;
         } catch (flashError) {
           console.log("🔥 Groq Limit/Error! Activating OLLAMA Local Engine for Flash...");
-          // 🛠️ FIX APPLIED HERE
           const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -164,11 +141,9 @@ CRITICAL RULES:
           });
           const ollamaData = await ollamaResponse.json();
           reply = ollamaData.message?.content || "System overload. Local fallback also failed.";
-          console.log("✅ Answered by Ollama (Flash Backup)");
         }
       } 
       
-      // 🧠 CASE 2: SVA CORE (Triple-Engine)
       else if (activeModel === "SVA Core") {
         console.log("⚙️ Executing SVA Core: Trying SambaNova...");
         try {
@@ -190,8 +165,6 @@ CRITICAL RULES:
 
           const data = JSON.parse(rawText);
           reply = data.choices?.[0]?.message?.content || reply;
-          console.log("✅ Answered by SambaNova (Level 1)");
-
         } catch (backupError) {
           console.log("🔄 Level 1 Failed. Fetching from Groq 70B...");
           try {
@@ -201,11 +174,8 @@ CRITICAL RULES:
               temperature: 0.2 
             });
             reply = chatCompletion.choices?.[0]?.message?.content || reply;
-            console.log("✅ Answered by Groq (Level 2 Backup)");
-
           } catch (criticalError) {
             console.log("🔥 Level 2 Failed. Activating OLLAMA Local Engine...");
-            // 🛠️ FIX APPLIED HERE
             const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -213,15 +183,12 @@ CRITICAL RULES:
             });
             const ollamaData = await ollamaResponse.json();
             reply = ollamaData.message?.content || "System overload. Even local engine failed.";
-            console.log("✅ Answered by Ollama (Ultimate Backup)");
           }
         }
       }
 
-      // 🛡️ CASE 3: OLLAMA DIRECT (SVA Secure)
       else if (activeModel === "SVA Secure") {
         console.log("⚙️ Executing Locally on Ollama...");
-        // 🛠️ FIX APPLIED HERE
         const response = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -229,8 +196,6 @@ CRITICAL RULES:
         });
         
         const data = await response.json();
-        
-        // 🚨 OLLAMA DEBUG LOG
         if (!response.ok || data.error) {
             console.log("❌ OLLAMA HIDDEN ERROR:", data);
         }
@@ -243,9 +208,6 @@ CRITICAL RULES:
       return res.status(500).json({ success: false, message: `Engine Failure: ${activeModel} is offline.` });
     }
 
-    /* =========================================
-       💾 SAVE CHAT & RESPONSE
-    ========================================= */
     let title = "New Chat";
     const existingSession = await Chat.findOne({ sessionId });
     if (!existingSession) {
@@ -269,12 +231,40 @@ CRITICAL RULES:
 export const getSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    // 🚨 Yahan bhi safe check laga diya
     const userId = req.user._id || req.user.id; 
     
     const chats = await Chat.find({ sessionId, userId }).sort({ createdAt: 1 });
     res.json({ success: true, chats });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to load session" });
+  }
+};
+
+// 🚨 YEH RAHA DUAL-SAVE KA BACKEND LOGIC
+export const saveGeneratedImage = async (req, res) => {
+  try {
+    const { sessionId, prompt, imageUrl } = req.body;
+    const userId = req.user.id || req.user._id;
+
+    // 📁 1. LIBRARY MEIN SAVE KAREGA
+    await Library.create({ userId, prompt, url: imageUrl });
+
+    // 💬 2. CHAT HISTORY MEIN SAVE KAREGA
+    const existingSession = await Chat.findOne({ sessionId });
+    const title = existingSession ? existingSession.title : prompt.slice(0, 40);
+
+    await Chat.create({
+      sessionId,
+      userId,
+      title,
+      message: prompt,
+      reply: "Generated successfully.",
+      image: imageUrl 
+    });
+
+    res.json({ success: true, message: "Dual-Save Complete!" });
+  } catch (error) {
+    console.error("❌ Dual Save Error:", error);
+    res.status(500).json({ success: false });
   }
 };
