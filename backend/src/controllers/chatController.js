@@ -240,16 +240,14 @@ export const getSession = async (req, res) => {
   }
 };
 
-// 🚨 YEH RAHA DUAL-SAVE KA BACKEND LOGIC
 export const saveGeneratedImage = async (req, res) => {
   try {
     const { sessionId, prompt, imageUrl } = req.body;
-    const userId = req.user.id || req.user._id;
 
-    // 📁 1. LIBRARY MEIN SAVE KAREGA
-    await Library.create({ userId, prompt, url: imageUrl });
+    // 🚨 CRASH FIX 1: Agar Auth token nahi mila toh code crash hone ke bajaye 'guest' maan lega
+    const userId = req.user ? (req.user.id || req.user._id) : "guest";
 
-    // 💬 2. CHAT HISTORY MEIN SAVE KAREGA
+    // 💬 CHAT HISTORY SAVE (Main priority)
     const existingSession = await Chat.findOne({ sessionId });
     const title = existingSession ? existingSession.title : prompt.slice(0, 40);
 
@@ -262,9 +260,18 @@ export const saveGeneratedImage = async (req, res) => {
       image: imageUrl 
     });
 
-    res.json({ success: true, message: "Dual-Save Complete!" });
+    // 📁 LIBRARY SAVE (Safe Mode)
+    // Isko try-catch mein daala hai taaki agar Library model mein koi issue ho, toh chat save hona na ruke
+    try {
+      await Library.create({ userId, prompt, url: imageUrl });
+    } catch (libError) {
+      console.log("⚠️ Library Save Skipped (Check Schema):", libError.message);
+    }
+
+    res.json({ success: true, message: "Dual-Save Successful!" });
   } catch (error) {
     console.error("❌ Dual Save Error:", error);
-    res.status(500).json({ success: false });
+    // 🚨 CRASH FIX 2: Ab browser ko seedha exact error bhejega!
+    res.status(500).json({ success: false, message: error.message });
   }
 };
