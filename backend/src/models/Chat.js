@@ -27,6 +27,12 @@ const chatSchema = new mongoose.Schema({
     required:true
   },
 
+  // 🚨 ASLI GUNEHGAR YAHAN THA! Ab MongoDB image reject nahi karega.
+  image:{
+    type:String,
+    default: null
+  },
+
   createdAt:{
     type:Date,
     default:Date.now
