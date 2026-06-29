@@ -58,11 +58,9 @@ app.use("/api", apiLimiter);
 // ⚙️ STANDARD MIDDLEWARES
 // =========================================
 
-app.use(
-  express.json({
-    limit: "50mb", // Kept your 50mb limit for uploads intact
-  })
-);
+// 🚨 JSON Limit badha di taaki Base64 images easily DB tak jaa sakein
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 /* ROUTES */
 

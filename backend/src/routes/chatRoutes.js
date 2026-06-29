@@ -2,7 +2,8 @@ import express from "express";
 
 import {
   chat,
-  getSession
+  getSession,
+  saveGeneratedImage
 } from "../controllers/chatController.js";
 
 import {
@@ -21,6 +22,8 @@ router.post(
   protect,
   chat
 );
+
+router.post("/save-image", saveGeneratedImage);
 
 /* =========================================
    GET CHAT SESSION
