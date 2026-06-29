@@ -133,7 +133,6 @@ Instructions:
 
 }
 
-
   /* WEB SEARCH DETECTION */
   const needsWeb = ["latest", "today", "news", "current", "recent", "announcement", "update"].some(word => userMessage.toLowerCase().includes(word));
 

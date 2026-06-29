@@ -6,6 +6,8 @@ import helmet from "helmet"; // 🛡️ NEW: Secures HTTP headers
 import rateLimit from "express-rate-limit"; // 🛡️ NEW: Blocks API spam
 
 import authRoutes from "./routes/authRoutes.js";
+import memoryRoutes from "./routes/memoryRoutes.js";
+import libraryRoutes from "./routes/libraryRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import connectDB from "./config/db.js";
@@ -65,6 +67,8 @@ app.use(
 /* ROUTES */
 
 app.use("/api/auth", authRoutes);
+app.use("/api/memory", memoryRoutes);
+app.use("/api/library", libraryRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/history", historyRoutes);

@@ -17,3 +17,5 @@ export const protect = (req, res, next) => {
     return res.status(401).json({ success: false, message: "Not authorized" });
   }
 };
+
+export const verifyToken = protect;

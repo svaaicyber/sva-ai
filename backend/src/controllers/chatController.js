@@ -12,6 +12,9 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
+// 🛠️ FIX: Environment variable se Ollama URL lo, warna default fallback use karo
+const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
+
 export const chat = async (req, res) => {
   try {
     console.log("📥 Backend received body:", { ...req.body, image: req.body.image ? "[BASE64_IMAGE_DATA]" : null }); 
@@ -153,7 +156,8 @@ CRITICAL RULES:
           reply = chatCompletion.choices?.[0]?.message?.content || reply;
         } catch (flashError) {
           console.log("🔥 Groq Limit/Error! Activating OLLAMA Local Engine for Flash...");
-          const ollamaResponse = await fetch('http://127.0.0.1:11434/api/chat', {
+          // 🛠️ FIX APPLIED HERE
+          const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: 'llama3.2', messages: messagesArray, stream: false })
@@ -201,7 +205,8 @@ CRITICAL RULES:
 
           } catch (criticalError) {
             console.log("🔥 Level 2 Failed. Activating OLLAMA Local Engine...");
-            const ollamaResponse = await fetch('http://127.0.0.1:11434/api/chat', {
+            // 🛠️ FIX APPLIED HERE
+            const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ model: 'llama3.2', messages: messagesArray, stream: false })
@@ -216,7 +221,8 @@ CRITICAL RULES:
       // 🛡️ CASE 3: OLLAMA DIRECT (SVA Secure)
       else if (activeModel === "SVA Secure") {
         console.log("⚙️ Executing Locally on Ollama...");
-        const response = await fetch('http://127.0.0.1:11434/api/chat', {
+        // 🛠️ FIX APPLIED HERE
+        const response = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: 'llama3.2:1b', messages: messagesArray, stream: false })

@@ -8,27 +8,35 @@ router.post("/generate", async (req, res) => {
   try {
     let { prompt } = req.body;
     
-    // 🧠 SVA Brain: Agar frontend se json markdown galti se aa jaye toh clean karein
+    // Safety check
+    if (!prompt || prompt.trim() === "") {
+        prompt = "A futuristic glowing AI core, highly detailed, neon lights";
+    }
+    
+    // 🧠 SVA Brain: JSON markdown cleanup
     if (prompt.includes("```json")) {
       try {
         const cleanJson = prompt.replace(/```json|```/g, "").trim();
         const parsed = JSON.parse(cleanJson);
         prompt = parsed.description || parsed.prompt || prompt;
       } catch (e) {
-        // Fallback agar parse na ho
         prompt = prompt.replace(/```json[\s\S]*?}/g, "").trim();
       }
     }
 
-    // 🔥 Step 1: Pass it through our Master Prompt Enhancer (8K, detailed anatomy rules)
+    // 🔥 Step 1: Pass it through our Master Prompt Enhancer
     const enhancedPrompt = await enhanceImagePrompt(prompt);
-    console.log(`🎨 SVA Vision (Pollinations Flux) Generating: "${enhancedPrompt.substring(0, 50)}..."`);
+    
+    // 🚀 THE ULTIMATE CACHE BUSTER!
+    const cacheBuster = ` [sig: ${Math.floor(Math.random() * 9999999)}]`;
+    const finalPromptForAPI = enhancedPrompt + cacheBuster;
+    
+    console.log(`🎨 SVA Vision Generating: "${finalPromptForAPI.substring(0, 70)}..."`);
 
-    // 🚀 Step 2: Force Pollinations to use the ultra-premium 'flux' model
-    const encodedPrompt = encodeURIComponent(enhancedPrompt);
-    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&width=1024&height=1024&enhance=false`;
+    const encodedPrompt = encodeURIComponent(finalPromptForAPI);
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&width=1024&height=1024&nologo=true`;
 
-    // ⚡ Step 3: Fetch the image binary and convert to Base64 for the React Widget
+    // ⚡ Step 3: Fetch the image binary and convert to Base64
     const response = await fetch(pollinationsUrl);
     
     if (!response.ok) {
