@@ -1,3 +1,5 @@
+console.log("HELLO FROM SESSION CONTROLLER");
+
 import Chat from "../models/Chat.js";
 
 // 1. Sidebar ke liye saare unique sessions lana (Sirf logged-in user ke)
@@ -33,18 +35,30 @@ export const getAllSessions = async (req, res) => {
   }
 };
 
-// 2. Ek specific session ki saari chats lana (Jab tu sidebar se kisi chat pe click kare)
 export const getSessionChats = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const userId = req.user.id; // 🚨 Security check
+    const userId = req.user.id;
 
-    // Database se sirf is session aur is user ki chats laao (purani se nayi ki taraf sort karke)
-    const chats = await Chat.find({ sessionId, userId }).sort({ createdAt: 1 });
-    
-    res.json({ success: true, chats });
+    const chats = await Chat.find({
+      sessionId,
+      userId
+    }).sort({ createdAt: 1 });
+
+    console.log("========== SESSION ==========");
+    console.log("Session:", sessionId);
+    console.log(JSON.stringify(chats, null, 2));
+    console.log("=============================");
+
+    res.json({
+      success: true,
+      chats
+    });
+
   } catch (error) {
-    console.error("Fetch Single Session Error:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error(error);
+    res.status(500).json({
+      success: false
+    });
   }
 };
