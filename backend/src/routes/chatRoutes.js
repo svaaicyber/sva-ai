@@ -23,7 +23,11 @@ router.post(
   chat
 );
 
-router.post("/save-image", saveGeneratedImage);
+router.post(
+  "/save-image",
+  protect,
+  saveGeneratedImage
+);
 
 /* =========================================
    GET CHAT SESSION

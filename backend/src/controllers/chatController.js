@@ -244,11 +244,13 @@ export const saveGeneratedImage = async (req, res) => {
   try {
     const { sessionId, prompt, imageUrl } = req.body;
 
-    // 🚨 CRASH FIX 1: Agar Auth token nahi mila toh code crash hone ke bajaye 'guest' maan lega
-    const userId = req.user ? (req.user.id || req.user._id) : "guest";
+    const userId = req.user.id || req.user._id;
 
     // 💬 CHAT HISTORY SAVE (Main priority)
-    const existingSession = await Chat.findOne({ sessionId });
+    const existingSession = await Chat.findOne({
+  sessionId,
+  userId
+});
     const title = existingSession ? existingSession.title : prompt.slice(0, 40);
 
     await Chat.create({
