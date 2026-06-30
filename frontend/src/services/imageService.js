@@ -1,9 +1,9 @@
 export const generateImage = async (prompt) => {
   try {
-    const token = localStorage.getItem("sva_token"); // Consistency ke liye token bhi bhej dete hain
+    const token = localStorage.getItem("sva_token"); 
 
-    // 🚨 Hardcoded IP hata diya! Ab relative path use karenge taaki Proxy kaam kare
-    const response = await fetch("/api/images/generate", { 
+    // 🚨 Render Cloud ka poora rasta daal diya
+    const response = await fetch("https://sva-eniy.onrender.com/api/images/generate", { 
       method: "POST",
       headers: {
         "Content-Type": "application/json",

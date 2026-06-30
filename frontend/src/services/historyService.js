@@ -1,7 +1,6 @@
-// 🚨 IP ka jhanjhat khatam! Proxy seedha backend pe le jayega
-const API_URL = "/api/history"; 
+// 🚨 Apni .env file se base URL uthao
+const API_URL = "https://sva-eniy.onrender.com/api/history";
 
-// ✅ Correct syntax: 'export' aur 'const' ek saath aate hain
 export const getHistory = async () => {
   try {
     const token = localStorage.getItem("sva_token");

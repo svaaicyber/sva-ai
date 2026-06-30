@@ -1,12 +1,12 @@
-// 🚨 IP aur Port ka jhanjhat hamesha ke liye khatam
-const API_URL = "/api/chat";
+// 🚨 Apni .env file se base URL uthao
+const BASE_URL = import.meta.env.VITE_API_URL;
+const API_URL = "https://sva-eniy.onrender.com/api/chat";
 
 export const sendMessage = async (message, history, sessionId, activeAgent, location, selectedModel, base64Image = null) => {
   const ghostMode = localStorage.getItem("sva_ghost") === "true";
   const systemDirectives = localStorage.getItem("sva_directives") || "";
   const token = localStorage.getItem("sva_token");
   
-  // 🚨 Yahan se CURRENT_IP wala kachra nikal diya
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -22,7 +22,7 @@ export const sendMessage = async (message, history, sessionId, activeAgent, loca
       location,
       model: selectedModel,
       systemDirectives,
-      image: base64Image // 📸 YEH LINE PHOTO KO BACKEND TAK LE JAYEGI
+      image: base64Image
     })
   });
   return response.json();
@@ -31,14 +31,13 @@ export const sendMessage = async (message, history, sessionId, activeAgent, loca
 export const uploadDocument = async (file) => {
   const formData = new FormData();
   formData.append("file", file); 
-  const token = localStorage.getItem("sva_token"); // 🚨 Uploads mein bhi token bhej de better security ke liye
+  const token = localStorage.getItem("sva_token"); 
 
   try {
-    // 🚨 Yahan se bhi hardcoded IP (192.168...) hata diya aur proxy path daal diya
-    const response = await fetch("/api/upload/document", {
+    const response = await fetch(`${BASE_URL}/api/upload/document`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}` // FormData ke saath Content-Type automatic set hota hai, toh usko empty chhod de
+        "Authorization": `Bearer ${token}` 
       },
       body: formData,
     });
@@ -46,5 +45,23 @@ export const uploadDocument = async (file) => {
   } catch (error) {
     console.error("Document Upload Error:", error);
     throw error;
+  }
+};
+
+// 🚨 YEH RAHA TERA NAYA DUAL-SAVE FUNCTION
+export const saveImageToHistory = async (sessionId, prompt, imageUrl) => {
+  const token = localStorage.getItem("sva_token");
+  try {
+    const response = await fetch(`${API_URL}/save-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ sessionId, prompt, imageUrl })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to save image to DB:", error);
   }
 };

@@ -1,85 +1,111 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Trash2, Plus, Server, ShieldAlert, Cpu, Loader2 } from 'lucide-react';
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
-import { db, auth } from '../firebase'; // Update path if needed
 import '../styles/memory-library.css';
+
+// 🚨 TERA LIVE RENDER CLOUD BACKEND
+const API_URL = "https://sva-eniy.onrender.com/api/memory";
 
 export default function Memory() {
   const [newMemory, setNewMemory] = useState("");
   const [memories, setMemories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isWiping, setIsWiping] = useState(false);
+  // Optional: Frontend pe naam dikhane ke liye
+  const userName = JSON.parse(localStorage.getItem("sva_user"))?.name || "User";
 
-  // 🚨 LIVE BACKEND SYNC
-  useEffect(() => {
-    // Check if user is logged in
-    const user = auth.currentUser;
-    if (!user) {
-      console.error("No user logged in!");
-      setLoading(false);
-      return;
-    }
+  // 1️⃣ 🚨 FETCH MEMORIES FROM RENDER BACKEND
+  const fetchMemories = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("sva_token");
+      if (!token) throw new Error("No token found");
 
-    // Create a query against the collection only for THIS user
-    const q = query(collection(db, "memories"), where("userId", "==", user.uid));
-    
-    // onSnapshot listens for real-time updates
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const memoryData = [];
-      snapshot.forEach((doc) => {
-        memoryData.push({ id: doc.id, ...doc.data() });
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
       });
-      // Sort newest first
-      setMemories(memoryData.sort((a, b) => b.timestamp - a.timestamp));
+      const data = await response.json();
+      
+      if (data.success) {
+        // Sort newest first
+        setMemories(data.memories.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      }
+    } catch (error) {
+      console.error("Error fetching memories:", error);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
 
-    return () => unsubscribe(); // Cleanup listener on unmount
+  useEffect(() => {
+    fetchMemories();
   }, []);
 
-  // 🚨 ADD DATA TO BACKEND
+  // 2️⃣ 🚨 ADD DATA TO RENDER BACKEND
   const handleAddMemory = async () => {
-    if (!newMemory.trim() || !auth.currentUser) return;
+    if (!newMemory.trim()) return;
+    const token = localStorage.getItem("sva_token");
     
     try {
-      await addDoc(collection(db, "memories"), {
-        text: newMemory,
-        userId: auth.currentUser.uid, // Tagging with User ID
-        type: "user_added",
-        timestamp: Date.now()
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ text: newMemory })
       });
-      setNewMemory("");
-    } catch (error) {
-      console.error("Error adding memory: ", error);
-    }
-  };
-
-  // 🚨 DELETE DATA FROM BACKEND
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, "memories", id));
-    } catch (error) {
-      console.error("Error deleting memory: ", error);
-    }
-  };
-
-  // 🚨 WIPE ALL USER DATA FROM BACKEND
-  const wipeAllMemory = async () => {
-    if (!auth.currentUser) return;
-    setIsWiping(true);
-    try {
-      const q = query(collection(db, "memories"), where("userId", "==", auth.currentUser.uid));
-      const querySnapshot = await getDocs(q);
       
-      const deletePromises = [];
-      querySnapshot.forEach((document) => {
-        deletePromises.push(deleteDoc(doc(db, "memories", document.id)));
-      });
-
-      await Promise.all(deletePromises); // Wait for all deletions to finish
+      const data = await response.json();
+      if (data.success) {
+        setNewMemory("");
+        fetchMemories(); // Refresh the list
+      }
     } catch (error) {
-      console.error("Error wiping memories: ", error);
+      console.error("Error adding memory:", error);
+    }
+  };
+
+  // 3️⃣ 🚨 DELETE DATA FROM RENDER BACKEND
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem("sva_token");
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        setMemories(memories.filter(mem => mem._id !== id));
+      }
+    } catch (error) {
+      console.error("Error deleting memory:", error);
+    }
+  };
+
+  // 4️⃣ 🚨 WIPE ALL USER DATA FROM RENDER BACKEND
+  const wipeAllMemory = async () => {
+    setIsWiping(true);
+    const token = localStorage.getItem("sva_token");
+    try {
+      const response = await fetch(`${API_URL}/all`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        setMemories([]);
+      }
+    } catch (error) {
+      console.error("Error wiping memories:", error);
     } finally {
       setIsWiping(false);
     }
@@ -92,7 +118,7 @@ export default function Memory() {
           <Brain size={32} color="#a855f7" />
           <div>
             <h1>Neural Memory</h1>
-            <p>Live synchronized memory for {auth.currentUser?.displayName || "User"}.</p>
+            <p>Live synchronized memory for {userName}.</p>
           </div>
         </div>
         <div className="server-status" style={{ color: loading ? '#eab308' : '#22c55e' }}>
@@ -122,12 +148,12 @@ export default function Memory() {
               {memories.length > 0 ? (
                 memories.map((mem) => (
                   <motion.div 
-                    key={mem.id} className="memory-card"
+                    key={mem._id} className="memory-card"
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9 }}
                   >
                     <Cpu size={16} color="#06b6d4" className="mem-icon" />
                     <p>{mem.text}</p>
-                    <button className="del-btn" onClick={() => handleDelete(mem.id)} title="Erase Memory">
+                    <button className="del-btn" onClick={() => handleDelete(mem._id)} title="Erase Memory">
                       <Trash2 size={16} />
                     </button>
                   </motion.div>

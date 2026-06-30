@@ -156,6 +156,8 @@ export default function Auth({ onLoginSuccess }) {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+      localStorage.setItem("sva_token", token);
       setName(result.user.displayName || 'User'); 
       setStep('onboarding'); 
     } catch (err) { 
@@ -171,6 +173,9 @@ export default function Auth({ onLoginSuccess }) {
       
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+
+      const token = await user.getIdToken();
+      localStorage.setItem("sva_token", token);
       
       // User data save kar rahe hain local storage mein
       localStorage.setItem("sva_user", JSON.stringify({ 
@@ -193,10 +198,20 @@ export default function Auth({ onLoginSuccess }) {
     e.preventDefault(); setError(''); setMsg(''); setLoading(true);
     try {
       if (step === 'login') {
-        await signInWithEmailAndPassword(auth, email, password);
-        onLoginSuccess(); // Direct entry, onboarding done during register
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // 🚨 FIX: Token save karo
+        const token = await userCredential.user.getIdToken();
+        localStorage.setItem("sva_token", token);
+        
+        onLoginSuccess(); 
       } else if (step === 'register') {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // 🚨 FIX: Token save karo
+        const token = await userCredential.user.getIdToken();
+        localStorage.setItem("sva_token", token);
+        
         setStep('onboarding'); 
       } else if (step === 'forgot') {
         await sendPasswordResetEmail(auth, email);

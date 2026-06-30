@@ -35,7 +35,7 @@ export default function Agents({ activeAgent, onSelectAgent }) {
   const fetchCustomAgents = async () => {
     try {
       let token = localStorage.getItem('sva_token') || "temp_dev_token";
-      const res = await axios.get('http://localhost:5000/api/agents', {
+      const res = await axios.get('https://sva-eniy.onrender.com/api/agents', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if(res.data.success) {
@@ -56,7 +56,7 @@ export default function Agents({ activeAgent, onSelectAgent }) {
     try {
       let token = localStorage.getItem('sva_token') || "temp_dev_token";
 
-      const response = await axios.post('http://localhost:5000/api/agents/create', {
+      const response = await axios.post('https://sva-eniy.onrender.com/api/agents/create', {
         name: customAgent.name,
         description: customAgent.description,
         systemPrompt: customAgent.prompt,
@@ -86,7 +86,7 @@ export default function Agents({ activeAgent, onSelectAgent }) {
       try {
         let token = localStorage.getItem('sva_token') || "temp_dev_token";
         
-        const response = await axios.delete(`http://localhost:5000/api/agents/${agentId}`, {
+        const response = await axios.delete(`https://sva-eniy.onrender.com/api/agents/${agentId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

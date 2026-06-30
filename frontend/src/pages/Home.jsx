@@ -9,34 +9,17 @@ import Settings from "../components/Settings";
 import CommandBar from "../components/CommandBar";
 import Agents from "../components/Agents";
 import Labs from "../components/Labs";
+import Memory from "../components/Memory";
+import Library from "../components/Library"
 
 import "../styles/home.css";
 
-import { sendMessage, uploadDocument } from "../services/chatService";
+// 🚨 YAHAN NAYA FUNCTION IMPORT KIYA HAI
+import { sendMessage, uploadDocument, saveImageToHistory } from "../services/chatService";
 import { getSession } from "../services/sessionService";
 import { generateImage } from "../services/imageService";
 
-/* ==========================================
-   🛠️ TEMPORARY OS MODULES (Placeholders)
-========================================== */
-const MemoryModule = () => (
-  <div className="os-module-placeholder">
-    <h1>🧠 System Memory</h1>
-    <p>SVA's context engine is initializing. Your long-term facts, preferences, and project files will appear here.</p>
-  </div>
-);
-
-const LibraryModule = () => (
-  <div className="os-module-placeholder">
-    <h1>📁 File Library</h1>
-    <p>Your uploaded documents, PDFs, and code snippets are safely stored here for SVA to reference.</p>
-  </div>
-);
-
 export default function Home() {
-  /* ==========================================
-      STATES
-  ========================================== */
   const [lastPrompt, setLastPrompt] = useState("");
   const [activeTab, setActiveTab] = useState("home"); 
   const [chatStarted, setChatStarted] = useState(false);
@@ -62,9 +45,6 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* ==========================================
-      USER NAME FETCH
-  ========================================== */
   useEffect(() => {
     const storedUser = localStorage.getItem("sva_user");
     if (storedUser) {
@@ -78,18 +58,12 @@ export default function Home() {
     }
   }, []);
 
-  /* ==========================================
-      VOICE STATES & STYLES
-  ========================================== */
   const [isCalling, setIsCalling] = useState(false);
   const [callStatus, setCallStatus] = useState("Connecting...");
   const stopGenerationRef = useRef(false);
   const recognitionRef = useRef(null);
   const isCallActiveRef = useRef(false);
 
-  /* ==========================================
-      THEME & LOCATION
-  ========================================== */
   useEffect(() => {
     const applyTheme = () => {
       const currentTheme = localStorage.getItem("sva_theme") || "neon-purple";
@@ -109,9 +83,6 @@ export default function Home() {
     }
   }, []);
 
-  /* ==========================================
-      TEXT TO SPEECH
-  ========================================== */
   const speakText = (text, onEndCallback = null) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -144,9 +115,6 @@ export default function Home() {
     window.speechSynthesis.speak(utterance);
   };
 
-  /* ==========================================
-      SPEECH RECOGNITION
-  ========================================== */
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -190,9 +158,6 @@ export default function Home() {
     }
   }, [sessionId, activeAgent, userLocation, selectedModel, messages]); 
 
-  /* ==========================================
-      START & END CALL
-  ========================================== */
   const startVoiceCall = () => {
     setIsCalling(true);
     setChatStarted(true);
@@ -212,9 +177,6 @@ export default function Home() {
     window.speechSynthesis.cancel();
   };
 
-  /* ==========================================
-      🚨 SEND MESSAGE 🚨
-  ========================================== */
   const handleDirectSend = async (textToSubmit, fileAttachment) => {
     stopGenerationRef.current = false;
     const text = textToSubmit || input;
@@ -243,11 +205,17 @@ export default function Home() {
       const hasAction = ["generate", "create", "make", "draw", "design"].some(word => textLower.includes(word));
       const hasMedium = ["image", "photo", "picture", "art"].some(word => textLower.includes(word));
 
-      /* 🎨 IMAGE GENERATION */
+      /* 🎨 IMAGE GENERATION - 🚨 DUAL SAVE YAHAN HAI */
       if (hasAction && hasMedium && !fileAttachment) {
         const result = await generateImage(text);
         if (result.success) {
           setMessages(prev => [...prev, { role: "ai", text: "Generated successfully.", image: result.imageUrl }]);
+          
+          // 1. Backend ko bhejo taaki DB mein hamesha ke liye save ho
+          await saveImageToHistory(sessionId, text, result.imageUrl);
+          
+          // 2. Sidebar refresh karo
+          setRefreshSidebar(prev => prev + 1);
         }
         setLoading(false);
         return;
@@ -267,23 +235,16 @@ export default function Home() {
     setLoading(false);
   };
 
-  /* ==========================================
-      🔄 REGENERATE LOGIC (Updated for Indexing)
-  ========================================== */
   const handleRegenerate = async (index) => {
     if (messages.length === 0) return;
 
     let updatedHistory = [...messages];
     let userMessageText = lastPrompt;
 
-    // Agar index define hai aur wo message AI ka hai
     if (typeof index === 'number' && updatedHistory[index]?.role === "ai") {
-      // AI se ek kadam pehle wala user ka question nikal lo
       userMessageText = updatedHistory[index - 1].text;
-      // Array ko us point tak kaat do (AI aur User dono ka message hatega kyunki handleDirectSend user msg wapas add karega)
       updatedHistory = updatedHistory.slice(0, index - 1);
     } else {
-      // Fallback: Agar kisi reason se index pass nahi hua, toh aakhri message uda do
       if (updatedHistory[updatedHistory.length - 1]?.role === "ai") {
         updatedHistory.pop();
       }
@@ -291,16 +252,12 @@ export default function Home() {
       updatedHistory.pop(); 
     }
 
-    // Purani history clear karke naya message bhej do
     setMessages(updatedHistory);
     await handleDirectSend(userMessageText, null);
   };
 
   const stopResponse = () => { stopGenerationRef.current = true; };
 
-  /* ==========================================
-      DRAG EVENTS
-  ========================================== */
   const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
   const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
   const handleDrop = (e) => {
@@ -312,13 +269,8 @@ export default function Home() {
     }
   };
 
-  /* ==========================================
-      RENDER
-  ========================================== */
   return (
     <div className="home">
-
-      {/* 🎙️ THE PREMIUM FULLSCREEN CALL UI */}
       {isCalling && (
         <div className="sva-live-call-screen">
           <div className="call-header">
@@ -361,7 +313,11 @@ export default function Home() {
           onSelectChat={async (id) => {
             const data = await getSession(id);
             if (data.success) {
-              setMessages(data.chats.flatMap(c => [{ role: "user", text: c.message }, { role: "ai", text: c.reply }]));
+              // 🚨 IMAGE LOAD HOGI RELOAD PE (Yahan 'image: c.image' daal diya hai)
+              setMessages(data.chats.flatMap(c => [
+                { role: "user", text: c.message }, 
+                { role: "ai", text: c.reply, image: c.image || null }
+              ]));
               setChatStarted(true);
               setSessionId(id);
               setIsMobileMenuOpen(false);
@@ -392,9 +348,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* ====================================================
-            ROUTING LOGIC
-        ==================================================== */}
         {activeTab === "insights" ? (
           <Insights />
         ) : ["account", "settings", "feedback", "help", "shortcuts"].includes(activeTab) ? (
@@ -402,14 +355,13 @@ export default function Home() {
         ) : activeTab === "agents" ? (
           <Agents activeAgent={activeAgent} onSelectAgent={(agentId) => { setActiveAgent(agentId); setActiveTab("home"); }} />
         ) : activeTab === "memory" ? (
-          <MemoryModule />
+          <Memory />
         ) : activeTab === "labs" ? (
           <Labs />
         ) : activeTab === "library" ? (
-          <LibraryModule />
+          <Library />
         ) : (
           <>
-            {/* DESKTOP HERO */}
             {!isMobile && !chatStarted && (
               <>
                 <Hero />
@@ -417,17 +369,13 @@ export default function Home() {
               </>
             )}
 
-            {/* 🌌 SVA DRONE SHOW HERO (Particle Assembly) */}
             {isMobile && !chatStarted && (
               <div className="mobile-drone-show">
-                {/* Background Night Sky (Stars waiting for the show) */}
                 <div className="night-sky-parallax">
                   {[...Array(40)].map((_, i) => (
                     <div key={`star-${i}`} className="ambient-star" style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 3}s` }}></div>
                   ))}
                 </div>
-
-                {/* The Drone Particle Text */}
                 <div className="drone-text-assembly">
                   <h1 className="particle-word hey-word">Hey,</h1>
                   <h1 className="particle-word name-word">{userName || userName }.</h1>
@@ -436,7 +384,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* COMMAND BAR */}
             <div className="mobile-dock-wrapper">
               <CommandBar
                 activeAgent={activeAgent}
@@ -449,7 +396,7 @@ export default function Home() {
                 loading={loading}
                 onSend={(text, file) => handleDirectSend(text, file)}
                 onCallTrigger={startVoiceCall}
-                onRegenerate={handleRegenerate} // 🚨 Naya regenerate function link ho gaya
+                onRegenerate={handleRegenerate}
                 onStopResponse={stopResponse}
               />
             </div>

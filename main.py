@@ -9,7 +9,7 @@ import json
 # EXACT IMPORT: Router se route_query function mangwa rahe hain
 from brain.router import route_query 
 
-app = FastAPI(title="SVA OMNI Backend", version="2.0.0")
+app = FastAPI(title="SVA Backend", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,

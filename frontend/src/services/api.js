@@ -1,4 +1,4 @@
-const API_URL="http://localhost:5000/api/chat";
+const API_URL="http://192.168.0.100:5000/api/chat";
 
 export const sendMessage=async(message)=>{
 

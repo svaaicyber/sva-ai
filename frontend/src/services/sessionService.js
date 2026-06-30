@@ -1,9 +1,9 @@
-// 🚨 IP hataya, sirf '/api/session' rakha taaki Proxy apna kaam kare
-const API_URL = "/api/session"; 
+// 🚨 Render Cloud ka poora rasta
+const API_URL = "https://sva-eniy.onrender.com/api/session"; 
 
 export const getSession = async (sessionId) => {
   try {
-    const token = localStorage.getItem("sva_token"); // 🚨 Token add kiya backend verification ke liye
+    const token = localStorage.getItem("sva_token"); 
     
     const response = await fetch(`${API_URL}/${sessionId}`, {
       method: "GET",

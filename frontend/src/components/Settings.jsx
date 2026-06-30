@@ -79,7 +79,7 @@ export default function Settings({ activeTab, onClose }) {
       const token = localStorage.getItem("sva_token");
       if (!token) return alert("You must be logged in to export data.");
 
-      const response = await axios.get("http://localhost:5000/api/settings/export", {
+      const response = await axios.get("https://sva-eniy.onrender.com/api/settings/export", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -109,7 +109,7 @@ export default function Settings({ activeTab, onClose }) {
     if (confirmDelete) {
       try {
         const token = localStorage.getItem("sva_token");
-        const response = await axios.delete("http://localhost:5000/api/settings/clear-chats", {
+        const response = await axios.delete("https://sva-eniy.onrender.com/api/settings/clear-chats", {
           headers: { Authorization: `Bearer ${token}` }
         });
 

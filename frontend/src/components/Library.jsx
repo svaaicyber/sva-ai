@@ -1,42 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Image as ImageIcon, Download, Trash2, HardDrive, Loader2 } from 'lucide-react';
-import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
 import '../styles/memory-library.css';
+
+// 🚨 TERA LIVE RENDER CLOUD BACKEND
+const API_URL = "https://sva-eniy.onrender.com/api/library";
 
 export default function Library() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🚨 FETCH LIVE IMAGES FROM BACKEND
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+  // 1️⃣ 🚨 FETCH LIVE IMAGES FROM BACKEND
+  const fetchLibrary = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("sva_token");
+      if (!token) throw new Error("No token found");
 
-    const q = query(collection(db, "library"), where("userId", "==", user.uid));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const imageData = [];
-      snapshot.forEach((doc) => {
-        imageData.push({ id: doc.id, ...doc.data() });
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
       });
-      setImages(imageData.sort((a, b) => b.timestamp - a.timestamp));
+      
+      const data = await response.json();
+      if (data.success) {
+        // Sort newest first
+        setImages(data.assets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      }
+    } catch (error) {
+      console.error("Error fetching library:", error);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchLibrary();
   }, []);
 
-  // 🚨 DELETE IMAGE FROM BACKEND
+  // 2️⃣ 🚨 DELETE IMAGE FROM BACKEND
   const deleteImage = async (id) => {
     try {
-      await deleteDoc(doc(db, "library", id));
+      const token = localStorage.getItem("sva_token");
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        setImages(images.filter(img => img._id !== id));
+      }
     } catch (error) {
-      console.error("Error deleting image: ", error);
+      console.error("Error deleting image:", error);
     }
   };
 
@@ -63,21 +83,21 @@ export default function Library() {
       ) : images.length > 0 ? (
         <div className="library-grid">
           {images.map((img) => (
-            <motion.div key={img.id} className="library-card" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+            <motion.div key={img._id} className="library-card" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
               <div className="img-wrapper">
                 <img src={img.url} alt={img.prompt} loading="lazy" />
                 <div className="img-overlay">
                   <a href={img.url} target="_blank" rel="noreferrer" className="icon-btn download" title="Download">
                     <Download size={18} />
                   </a>
-                  <button className="icon-btn delete" onClick={() => deleteImage(img.id)} title="Delete">
+                  <button className="icon-btn delete" onClick={() => deleteImage(img._id)} title="Delete">
                     <Trash2 size={18} />
                   </button>
                 </div>
               </div>
               <div className="img-info">
                 <p className="prompt" title={img.prompt}>"{img.prompt}"</p>
-                <span className="date">{new Date(img.timestamp).toLocaleDateString()}</span>
+                <span className="date">{new Date(img.createdAt).toLocaleDateString()}</span>
               </div>
             </motion.div>
           ))}

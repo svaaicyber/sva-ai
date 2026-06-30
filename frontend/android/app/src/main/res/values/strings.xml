@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SVA AI - Ask, Chat, Create</string>
+    <string name="title_activity_main">SVA AI - Ask, Chat, Create</string>
+    <string name="package_name">com.incesa.svaai</string>
+    <string name="custom_url_scheme">com.incesa.svaai</string>
+</resources>

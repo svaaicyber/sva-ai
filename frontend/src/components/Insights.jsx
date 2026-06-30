@@ -72,15 +72,16 @@ export default function Insights() {
 
         const CURRENT_IP = window.location.hostname;
         
-        const res = await fetch(`http://${CURRENT_IP}:5000/api/analytics`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` 
-          }
-        }); 
-        
-        const data = await res.json();
+       const response = await fetch("https://sva-eniy.onrender.com/api/analytics", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}` 
+  }
+}); 
+
+// ✅ FIX: 'res' ko 'response' kar diya
+const data = await response.json();
         
         if (data.success) {
           // ✅ Backend ne real data bhej diya

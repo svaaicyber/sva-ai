@@ -1,5 +1,5 @@
-// 🚨 IP hata diya! Ab proxy sambhalega.
-const API_URL = "/api/auth";
+// 🚨 Render Cloud ka poora rasta
+const API_URL = "https://sva-eniy.onrender.com/api/auth";
 
 export const registerUser = async (name, email, password) => {
   try {
@@ -27,10 +27,9 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// 🚨 YEH THA MISSING FUNCTION
 export const verifyOTP = async (email, otp) => {
   try {
-    const response = await fetch(`${API_URL}/verify-otp`, { // Make sure tera backend route yahi ho
+    const response = await fetch(`${API_URL}/verify-otp`, { 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
@@ -41,7 +40,6 @@ export const verifyOTP = async (email, otp) => {
   }
 };
 
-// 🚨 Safety ke liye Send OTP bhi daal diya (incase Auth.jsx maange)
 export const sendOTP = async (email) => {
   try {
     const response = await fetch(`${API_URL}/send-otp`, {
